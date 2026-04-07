@@ -90,15 +90,32 @@ class RAGSystem:
     
     def _get_embedding(self, text: str) -> List[float]:
         """Get embedding from OpenRouter using text-embedding-3-small"""
-        response = self.http_client.post(
-            f"{self.base_url}/embeddings",
-            json={
-                "model": "text-embedding-3-small",
-                "input": text
-            }
-        )
-        response.raise_for_status()
-        return response.json()["data"][0]["embedding"]
+        try:
+            response = self.http_client.post(
+                f"{self.base_url}/embeddings",
+                json={
+                    "model": "text-embedding-3-small",
+                    "input": text
+                }
+            )
+            response.raise_for_status()
+            result = response.json()
+            
+            # Check for error in response
+            if "error" in result:
+                print(f"❌ Embedding API Error: {result.get('error')}")
+                # Return a dummy embedding if API fails
+                return [0.0] * 1536
+            
+            if "data" not in result:
+                print(f"⚠️ Unexpected embedding response format: {result}")
+                return [0.0] * 1536
+            
+            return result["data"][0]["embedding"]
+        except Exception as e:
+            print(f"❌ Embedding error: {str(e)}")
+            # Return a dummy embedding to prevent crashes
+            return [0.0] * 1536
     
     def _chunk_text(self, text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
         """Split text into overlapping chunks"""
@@ -180,7 +197,10 @@ class RAGSystem:
             
             # If specific project found, fetch its details
             if specific_repo:
-                repo_name = specific_repo.get("name")
+                repo_name = specific_repo.get("name", "")
+                if not repo_name:
+                    print("❌ Repository name not found")
+                    return None
                 print(f"📖 Fetching detailed info for: {repo_name}")
                 detailed_repo = self.github_integration.get_repository_details(username, repo_name)
                 readme = self.github_integration.get_repository_readme(username, repo_name)
