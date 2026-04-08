@@ -1,0 +1,33 @@
+# Backend
+backend/.env
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/chroma_db/
+backend/chat_history.db
+backend/.DS_Store
+backend/.env.example
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.DS_Store
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

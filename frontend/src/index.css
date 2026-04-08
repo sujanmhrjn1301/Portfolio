@@ -1,0 +1,419 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0d0d0d;
+  color: #ececf1;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #565656;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6e6e6e;
+}
+
+/* Typography improvements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Chat message typography */
+.chat-message {
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+}
+
+/* Shimmer animation - smooth left to right sweep */
+@keyframes shimmerSweep {
+  0% {
+    background-position: -1200px 0;
+  }
+
+  100% {
+    background-position: 1200px 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg,
+      #6b7280 0%,
+      #9ca3af 15%,
+      #ffffff 50%,
+      #9ca3af 85%,
+      #6b7280 100%);
+  background-size: 1200px 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerSweep 3s infinite ease-in-out;
+}
+
+/* Subtle pulse animation for hero avatar */
+@keyframes pulseSubtle {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+/* Glow animation for focus states */
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Aurora Border Effect */
+@keyframes aurora-border {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 180% 50%;
+  }
+}
+
+.searchbar-aurora {
+  position: relative;
+  overflow: visible;
+}
+
+.searchbar-aurora::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: -1.5px;
+  z-index: 0;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(169, 255, 241, 0.15), rgba(255, 255, 255, 0.22), rgba(189, 209, 255, 0.16), rgba(169, 255, 241, 0.15));
+  background-size: 180% 100%;
+  animation: aurora-border 4s infinite linear;
+  filter: blur(0.8px);
+}
+
+.searchbar-aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 8px;
+  background: rgba(26, 26, 26, 0.95);
+}
+
+.searchbar-aurora input {
+  position: relative;
+  z-index: 2;
+}
+
+/* Smooth slide-in animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Float animation for cards */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+p {
+  line-height: 1.6;
+  color: #d4d4d4;
+}
+
+a {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #60a5fa;
+}
+
+code {
+  background-color: #2d2d30;
+  color: #ce9178;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.875em;
+}
+
+pre {
+  background-color: #2d2d30;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid #3e3e42;
+}
+
+pre code {
+  background-color: transparent;
+  color: #ce9178;
+  padding: 0;
+}
+
+/* Message bubbles */
+.message-user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #505050 0%, #3a3a3a 100%);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: slideInRight 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+}
+
+.message-assistant {
+  align-self: flex-start;
+  background-color: transparent;
+  color: #d4d4d4;
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Input focus styles with glow */
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  /* Touch-friendly elements */
+  button,
+  a,
+  input,
+  textarea {
+    min-height: 40px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Better scrolling on mobile */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 3px;
+  }
+
+  /* Disable hover states on touch devices */
+  @supports (hover: none) {
+    button:hover:not(:disabled) {
+      transform: none;
+    }
+
+    a:hover {
+      color: inherit;
+    }
+  }
+
+  /* Mobile-friendly modals */
+  .fixed.inset-0 {
+    padding: 0;
+  }
+
+  /* Better input on mobile */
+  input,
+  textarea {
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    font-family: inherit;
+  }
+
+  /* Remove default iOS styling */
+  button,
+  input,
+  textarea,
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  /* Better text selection on mobile */
+  * {
+    -webkit-touch-callout: none;
+  }
+
+  a {
+    -webkit-touch-callout: auto;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 500px) and (max-width: 768px) {
+  body {
+    font-size: 13px;
+  }
+
+  button,
+  a,
+  input {
+    min-height: 36px;
+  }
+
+  /* Compact spacing in landscape */
+  .p-4 {
+    padding: 8px;
+  }
+
+  .px-6 {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .py-3 {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #d4d4d4 0%, #f5f5f5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
