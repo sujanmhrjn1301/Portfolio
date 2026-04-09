@@ -34,26 +34,25 @@ function AppContent() {
 
     const fetchGitHubProjects = async () => {
       try {
-        const username = 'sujanmhrjn1301'; // Replace with your GitHub username
-        const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-        if (!response.ok) throw new Error('Failed to fetch GitHub projects');
+        // Use backend API instead of direct GitHub API call
+        // This allows the backend to handle auth and rate limiting
+        const repos = await chatAPI.getGitHubRepositories();
         
-        const repos = await response.json();
         // Filter out forks and map to project format
         const projectsData = repos
-          .filter(repo => !repo.fork) // Only include original projects
+          .filter(repo => !repo.fork_count || repo.fork_count === 0) // Only include original projects
           .map(repo => ({
             title: repo.name,
             description: repo.description || 'No description available',
-            link: repo.html_url,
+            link: repo.url,
             language: repo.language,
-            stars: repo.stargazers_count,
-            updated: repo.updated_at
+            stars: repo.stars,
           }));
         
         setProjects(projectsData);
       } catch (error) {
         console.error('Error fetching GitHub projects:', error);
+        // Silently fail - projects just won't show
       }
     };
 
