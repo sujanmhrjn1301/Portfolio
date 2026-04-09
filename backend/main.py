@@ -87,11 +87,8 @@ app = FastAPI(
 
 # ============ SECURITY MIDDLEWARE ============
 
-# Add trusted host middleware (important behind reverse proxy)
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=get_cors_origins()
-)
+# NOTE: Removed TrustedHostMiddleware since Render handles reverse proxy host validation
+# CORS middleware below properly handles cross-origin requests from frontend
 
 # Add CORS middleware with secure configuration
 app.add_middleware(
