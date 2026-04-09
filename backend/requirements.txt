@@ -22,7 +22,7 @@ httpx==0.25.2
 # Security & Authentication
 python-jose==3.3.0
 passlib==1.7.4
-PyJWT==2.8.1
+PyJWT==2.9.0
 bcrypt==4.1.2
 
 # Rate Limiting & Middleware
