@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9ca3af;stop-opacity:1" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle with glow -->
+  <circle cx="32" cy="32" r="30" fill="url(#bgGradient)" filter="url(#glow)"/>
+  
+  <!-- Brain icon -->
+  <g transform="translate(32, 32)">
+    <!-- Brain outline -->
+    <path d="M -6 -2 Q -8 -4 -8 -6 Q -8 -8 -6 -8 Q -4 -8 -3 -6 L -2 -3 Q -1 -5 0 -6 Q 1 -5 2 -3 L 3 -6 Q 4 -8 6 -8 Q 8 -8 8 -6 Q 8 -4 6 -2" fill="none" stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Brain left hemisphere -->
+    <path d="M -6 -2 Q -7 0 -6 2 Q -5 3 -3 3 Q -2 2 -2 0 Q -3 -1 -4 -1 Q -5 -1 -6 -2" fill="#000000" opacity="0.8"/>
+    
+    <!-- Brain right hemisphere -->
+    <path d="M 6 -2 Q 7 0 6 2 Q 5 3 3 3 Q 2 2 2 0 Q 3 -1 4 -1 Q 5 -1 6 -2" fill="#000000" opacity="0.8"/>
+    
+    <!-- Brain center line -->
+    <line x1="0" y1="-6" x2="0" y2="3" stroke="#000000" stroke-width="0.8" opacity="0.6"/>
+    
+    <!-- Brain ridges left -->
+    <path d="M -5 0 Q -4 1 -3 0" fill="none" stroke="#000000" stroke-width="0.6" opacity="0.5"/>
+    <path d="M -4 1 Q -3 2 -2 1" fill="none" stroke="#000000" stroke-width="0.6" opacity="0.5"/>
+    
+    <!-- Brain ridges right -->
+    <path d="M 5 0 Q 4 1 3 0" fill="none" stroke="#000000" stroke-width="0.6" opacity="0.5"/>
+    <path d="M 4 1 Q 3 2 2 1" fill="none" stroke="#000000" stroke-width="0.6" opacity="0.5"/>
+  </g>
+</svg>
