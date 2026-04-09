@@ -31,8 +31,5 @@ slowapi==0.1.9
 # Document Processing
 pypdf==4.0.1
 
-# CORS (fixed)
-fastapi-cors==0.1.0
-
 # Logging & Monitoring
 python-json-logger==2.0.7
