@@ -19,16 +19,38 @@ class GitHubIntegration:
         self.http_client = httpx.Client(headers=self.headers, timeout=30.0)
     
     def get_user_repositories(self, username: str) -> List[Dict]:
-        """Fetch all public repositories for a user"""
+        """Fetch all public repositories for a user (handles pagination)"""
         try:
             print(f"📚 Fetching repositories for user: {username}")
             url = f"{self.base_url}/users/{username}/repos"
-            response = self.http_client.get(url, params={"per_page": 100, "sort": "updated"})
-            response.raise_for_status()
+            all_repos = []
+            page = 1
             
-            repos = response.json()
-            print(f"✅ Found {len(repos)} repositories")
-            return repos
+            while True:
+                response = self.http_client.get(
+                    url,
+                    params={"per_page": 100, "sort": "updated", "page": page}
+                )
+                response.raise_for_status()
+                
+                repos = response.json()
+                if not repos:
+                    break
+                
+                all_repos.extend(repos)
+                
+                # Check if there's a next page
+                if "Link" not in response.headers:
+                    break
+                
+                link_header = response.headers["Link"]
+                if 'rel="next"' not in link_header:
+                    break
+                
+                page += 1
+            
+            print(f"✅ Found {len(all_repos)} repositories across {page} page(s)")
+            return all_repos
         except Exception as e:
             print(f"❌ Error fetching repositories: {str(e)}")
             return []
