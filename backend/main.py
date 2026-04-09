@@ -59,6 +59,7 @@ from security import (
     get_client_ip,
     create_secure_error_response,
 )
+from ingest_cv import ingest_cv
 
 # Load environment variables
 load_dotenv()
@@ -174,6 +175,56 @@ try:
 except Exception as e:
     logger.error(f"❌ Service initialization error: {str(e)}")
     raise
+
+
+# ============ DATABASE INITIALIZATION ============
+
+def is_portfolio_data_ingested():
+    """
+    Check if portfolio CV data has been ingested into ChromaDB
+    Returns True if collection has documents, False if empty
+    """
+    try:
+        # Query the collection to see if it has any data
+        collection_count = rag_system.collection.count()
+        logger.debug(f"ChromaDB collection count: {collection_count}")
+        return collection_count > 0
+    except Exception as e:
+        logger.warning(f"Could not check database state: {str(e)}")
+        return False
+
+
+def auto_ingest_portfolio_data():
+    """
+    Automatically ingest portfolio CV data on startup if database is empty
+    This ensures fresh deployments have data without manual intervention
+    """
+    if is_portfolio_data_ingested():
+        logger.info("✅ Portfolio data already ingested - skipping auto-ingest")
+        return
+    
+    logger.info("📚 Database empty - automatically ingesting portfolio data...")
+    try:
+        # Get the CV file path
+        cv_file_path = os.path.join(
+            os.path.dirname(__file__), 
+            "data", 
+            "Sujan-Maharjan-September-2025.pdf"
+        )
+        
+        # Check if file exists
+        if not os.path.exists(cv_file_path):
+            logger.warning(f"⚠️  CV file not found at {cv_file_path} - skipping auto-ingest")
+            return
+        
+        # Call ingest_cv (already has duplicate checking built-in)
+        logger.info(f"Ingesting from: {cv_file_path}")
+        ingest_cv(cv_file_path)
+        logger.info("✅ Portfolio data ingested successfully on startup")
+        
+    except Exception as e:
+        # Log error but don't crash the app
+        logger.error(f"❌ Auto-ingest failed: {str(e)} - app will work but without portfolio data")
 
 
 # ============ PYDANTIC MODELS ============
@@ -688,6 +739,9 @@ async def startup_event():
     logger.info(f"🚀 Starting AI Portfolio API in {ENVIRONMENT} mode")
     if DEBUG:
         logger.debug("Debug mode enabled")
+    
+    # Auto-ingest portfolio data if database is empty
+    auto_ingest_portfolio_data()
 
 
 @app.on_event("shutdown")
