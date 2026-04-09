@@ -3,10 +3,13 @@ fastapi==0.109.0
 uvicorn==0.27.0
 python-multipart==0.0.6
 
+# Build dependencies (required first)
+setuptools>=65.0.0
+
 # Database & Vector
 chromadb==0.4.24
 numpy==1.24.3
-pysqlite3-binary
+pysqlite3
 
 # Configuration & Environment
 python-dotenv==1.0.0
