@@ -11,6 +11,16 @@ Security Features:
 - Environment-based configuration
 """
 
+import sys
+
+# SQLite override for ChromaDB compatibility on Render
+# This is required because Render's default SQLite version is too old for ChromaDB
+try:
+    import pysqlite3  # type: ignore
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
+except ImportError:
+    pass
+
 import os
 import logging
 from datetime import timedelta

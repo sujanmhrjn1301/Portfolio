@@ -7,6 +7,7 @@ python-multipart==0.0.6
 chromadb==0.4.24
 sqlite3-python==1.0.0
 numpy<2.0.0
+pysqlite3-binary
 
 # Configuration & Environment
 python-dotenv==1.0.0
