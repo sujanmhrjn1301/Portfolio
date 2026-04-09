@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import SharedView from './components/SharedView';
 import Profile from './components/Profile';
+import AdminPanel from './components/AdminPanel';
 import { chatAPI } from './api';
 import './index.css';
 
@@ -20,6 +21,7 @@ function AppContent() {
   const [genZModeEnabled, setGenZModeEnabled] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Load portfolio info and GitHub projects on mount
   useEffect(() => {
@@ -194,6 +196,14 @@ function AppContent() {
     window.history.pushState(null, '', '/');
   };
 
+  const handleAdminClick = () => {
+    setShowAdminPanel(true);
+  };
+
+  const handleCloseAdminPanel = () => {
+    setShowAdminPanel(false);
+  };
+
   return (
     <Routes>
       <Route path="/shared/:shareId" element={<SharedView />} />
@@ -213,6 +223,7 @@ function AppContent() {
               isOpen={sidebarOpen}
               onToggle={() => setSidebarOpen(!sidebarOpen)}
               onProfileClick={handleProfileClick}
+              onAdminClick={handleAdminClick}
             />
 
             {/* Main Chat Window */}
@@ -231,6 +242,11 @@ function AppContent() {
             {/* Profile Modal Overlay */}
             {showProfileModal && (
               <Profile portfolioInfo={portfolioInfo} projects={projects} onClose={handleCloseProfileModal} />
+            )}
+
+            {/* Admin Panel Modal */}
+            {showAdminPanel && (
+              <AdminPanel onClose={handleCloseAdminPanel} />
             )}
           </div>
         }

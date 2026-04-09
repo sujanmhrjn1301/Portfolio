@@ -26,7 +26,7 @@ import logging
 from datetime import timedelta
 from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException, Request, Depends, status
+from fastapi import FastAPI, HTTPException, Request, Depends, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -39,6 +39,7 @@ from dotenv import load_dotenv
 from rag_system import RAGSystem
 from chat_history import ChatHistory
 from github_integration import GitHubIntegration
+from admin_db import init_admin_db, verify_admin_credentials
 from config import (
     GITHUB_CONFIG,
     CORS_ORIGINS,
@@ -46,6 +47,7 @@ from config import (
     ENVIRONMENT,
     SECRET_KEY,
     API_KEY,
+    ADMIN_PASSWORD,
     get_cors_origins,
     validate_config,
 )
@@ -592,6 +594,97 @@ async def ingest_cv_data(
         )
 
 
+def verify_admin_password(password: str) -> bool:
+    """Verify admin password for protected endpoints"""
+    # Default admin credentials from database
+    return verify_admin_credentials(username="eiji", password=password)
+
+
+@app.post("/upload-cv", tags=["Admin"])
+async def upload_cv_file(
+    file: UploadFile = File(...),
+    username: str = "eiji",
+    password: str = ""
+) -> dict:
+    """
+    Upload a new CV PDF file to update the knowledge base
+    
+    This endpoint:
+    1. Verifies the admin credentials (eiji / password)
+    2. Saves the uploaded PDF temporarily
+    3. Clears existing CV data
+    4. Ingests the new CV into the knowledge base
+    5. Cleans up temporary files
+    
+    The knowledge base updates instantly without restarting.
+    """
+    try:
+        # Verify credentials against admin database
+        if not verify_admin_credentials(username=username, password=password):
+            logger.warning(f"❌ Invalid admin credentials attempt: username={username}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password"
+            )
+        
+        # Validate file type
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only PDF files are supported"
+            )
+        
+        # Validate file size (max 10MB)
+        file_content = await file.read()
+        if len(file_content) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="File size exceeds 10MB limit"
+            )
+        
+        logger.info(f"📁 Processing uploaded CV file: {file.filename}")
+        
+        # Save to temporary location
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(file_content)
+            temp_path = tmp_file.name
+        
+        try:
+            # Clear existing collection
+            try:
+                rag_system.chroma_client.delete_collection(name="portfolio_cv")
+                logger.info("✅ Cleared existing CV data from database")
+            except Exception as e:
+                logger.warning(f"Could not delete collection (may not exist): {str(e)}")
+            
+            # Ingest the new CV
+            logger.info(f"📚 Ingesting uploaded CV from: {temp_path}")
+            ingest_cv(temp_path)
+            logger.info("✅ CV data ingested successfully from uploaded file")
+            
+            return {
+                "message": "CV uploaded and knowledge base updated successfully",
+                "filename": file.filename
+            }
+        
+        finally:
+            # Clean up temporary file
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ CV upload error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process CV upload: {str(e)}"
+        )
+
+
 # ============ PUBLIC INFO ENDPOINTS ============
 
 @app.get("/portfolio-info", response_model=PortfolioInfo, tags=["Portfolio"])
@@ -739,6 +832,9 @@ async def startup_event():
     logger.info(f"🚀 Starting AI Portfolio API in {ENVIRONMENT} mode")
     if DEBUG:
         logger.debug("Debug mode enabled")
+    
+    # Initialize admin database
+    init_admin_db()
     
     # Auto-ingest portfolio data if database is empty
     auto_ingest_portfolio_data()

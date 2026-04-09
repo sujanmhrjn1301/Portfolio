@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Share2, Menu, X, Github, Linkedin, Mail, Phone, MapPin, Sparkles, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, Share2, Menu, X, Github, Linkedin, Mail, Phone, MapPin, Sparkles, MessageCircle, Settings } from 'lucide-react';
 
 function Sidebar({
   conversations,
@@ -12,6 +12,7 @@ function Sidebar({
   isOpen,
   onToggle,
   onProfileClick,
+  onAdminClick,
 }) {
   const [hoverConvId, setHoverConvId] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -164,6 +165,18 @@ function Sidebar({
             </div>
           </div>
         )}
+
+        {/* Admin Settings Button */}
+        <div className="p-3 sm:p-4 border-t border-[#2a2a2a] bg-[#0d0d0d]">
+          <button
+            onClick={onAdminClick}
+            className="w-full flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#2a2a2a] text-[#9ca3af] hover:text-white py-2 px-4 rounded-lg font-medium text-sm transition-all duration-300 min-h-10"
+            title="Admin settings"
+          >
+            <Settings size={16} />
+            <span className="hidden sm:inline">Admin</span>
+          </button>
+        </div>
       </aside>
 
       {/* Mobile overlay */}

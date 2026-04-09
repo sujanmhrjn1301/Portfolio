@@ -30,6 +30,7 @@ PORTFOLIO_OWNER = {
 # ============ SECURITY ============
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 API_KEY = os.getenv("API_KEY", None)  # Optional API key for admin endpoints
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "iamsujanmaharjan")  # For CV upload
 
 # ============ CORS CONFIGURATION ============
 def get_cors_origins() -> List[str]:
