@@ -296,6 +296,24 @@ function ChatWindow({
               {genZModeEnabled && (
                 <span className="text-xs text-pink-400 animate-pulse">● Active</span>
               )}
+
+              <button
+                type="button"
+                onClick={() => onToggleLexiMode(!lexiModeEnabled)}
+                className={`flex items-center gap-2 px-3 py-2 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 min-h-10 sm:min-h-auto ${
+                  lexiModeEnabled
+                    ? 'bg-green-500/20 text-green-400 border border-green-400/50 shadow-lg shadow-green-500/20'
+                    : 'bg-[#2a2a2a] text-[#9ca3af] border border-[#404040] hover:border-[#505050] hover:text-white'
+                }`}
+                title="Toggle Lexi Mode"
+              >
+                <Brain size={16} />
+                <span className="hidden sm:inline">Lexi Mode</span>
+                <span className="sm:hidden">Lexi</span>
+              </button>
+              {lexiModeEnabled && (
+                <span className="text-xs text-green-400 animate-pulse">● Active</span>
+              )}
             </div>
 
             {/* Input Row */}

@@ -2,14 +2,16 @@
 import axios from 'axios';
 // Lexi API integration
 export const askLexi = async (query, mode = "github") => {
-  // Replace with your deployed Lexi FastAPI endpoint
-  const LEXI_API_URL = "https://your-lexi-api.onrender.com/api/v1/ask";
+  const LEXI_API_URL = "https://lexi-backend-9558.onrender.com/api/v1/ask";
   const response = await fetch(LEXI_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, mode }),
   });
-  if (!response.ok) throw new Error("Lexi API error");
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Lexi API error");
+  }
   return await response.json(); // { answer, metadata, process_logs }
 };
 

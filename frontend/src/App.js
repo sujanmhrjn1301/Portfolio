@@ -5,6 +5,7 @@ import ChatWindow from './components/ChatWindow';
 import SharedView from './components/SharedView';
 import Profile from './components/Profile';
 import AdminPanel from './components/AdminPanel';
+import LexiTerminal from './components/LexiTerminal';
 import { chatAPI, askLexi } from './api';
 import './index.css';
 
@@ -23,6 +24,7 @@ function AppContent() {
   const [projects, setProjects] = useState([]);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [lexiModeEnabled, setLexiModeEnabled] = useState(false);
+  const [showLexiTerminal, setShowLexiTerminal] = useState(false);
 
   // Load portfolio info and GitHub projects on mount
   useEffect(() => {
@@ -220,6 +222,13 @@ function AppContent() {
     setShowAdminPanel(false);
   };
 
+  const handleToggleLexiMode = (enabled) => {
+    setLexiModeEnabled(enabled);
+    if (enabled) {
+      setShowLexiTerminal(true);
+    }
+  };
+
   return (
     <Routes>
       <Route path="/shared/:shareId" element={<SharedView />} />
@@ -254,7 +263,7 @@ function AppContent() {
               genZModeEnabled={genZModeEnabled}
               onToggleGenZMode={setGenZModeEnabled}
               lexiModeEnabled={lexiModeEnabled}
-              onToggleLexiMode={setLexiModeEnabled}
+              onToggleLexiMode={handleToggleLexiMode}
             />
 
             {/* Profile Modal Overlay */}
@@ -266,6 +275,13 @@ function AppContent() {
             {showAdminPanel && (
               <AdminPanel onClose={handleCloseAdminPanel} />
             )}
+
+            {/* Lexi Terminal Modal */}
+            <LexiTerminal
+              isOpen={showLexiTerminal}
+              onClose={() => setShowLexiTerminal(false)}
+              mode={githubModeEnabled ? 'github' : genZModeEnabled ? 'gen-z' : 'github'}
+            />
           </div>
         }
       />
