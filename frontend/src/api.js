@@ -1,3 +1,5 @@
+
+import axios from 'axios';
 // Lexi API integration
 export const askLexi = async (query, mode = "github") => {
   // Replace with your deployed Lexi FastAPI endpoint
@@ -10,7 +12,6 @@ export const askLexi = async (query, mode = "github") => {
   if (!response.ok) throw new Error("Lexi API error");
   return await response.json(); // { answer, metadata, process_logs }
 };
-import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
