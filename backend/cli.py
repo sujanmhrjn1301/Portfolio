@@ -1,3 +1,5 @@
+import getpass
+from admin_db import add_admin
 #!/usr/bin/env python3
 """
 Portfolio Management CLI
@@ -19,6 +21,25 @@ def load_env():
 
 
 class PortfolioCLI:
+    def create_admin(self):
+        """Create the initial admin user interactively (bootstrap)"""
+        print("\n🔐 Admin User Bootstrap")
+        username = input("Enter new admin username: ").strip()
+        while not username:
+            print("Username cannot be empty.")
+            username = input("Enter new admin username: ").strip()
+        password = getpass.getpass("Enter new admin password: ")
+        confirm = getpass.getpass("Confirm password: ")
+        if password != confirm:
+            print("❌ Passwords do not match.")
+            return
+        if not password:
+            print("❌ Password cannot be empty.")
+            return
+        if add_admin(username, password):
+            print(f"✅ Admin user '{username}' created successfully!")
+        else:
+            print(f"❌ Failed to create admin user '{username}'. It may already exist.")
     def __init__(self):
         load_env()
         self.api_key = os.getenv("OPENAI_API_KEY")
@@ -159,39 +180,42 @@ Examples:
   python cli.py reset                  # Reset all data
         """
     )
-    
+
     subparsers = parser.add_subparsers(dest='command', help='Commands')
-    
+
     # Ingest command
     ingest_parser = subparsers.add_parser('ingest', help='Ingest CV data')
     ingest_parser.add_argument('cv_file', nargs='?', help='Path to CV file')
-    
+
     # Test command
     test_parser = subparsers.add_parser('test', help='Test RAG system')
     test_parser.add_argument('query', help='Query to test')
-    
+
     # List command
     subparsers.add_parser('list', help='List all conversations')
-    
+
     # Get command
     get_parser = subparsers.add_parser('get', help='Get conversation details')
     get_parser.add_argument('id', help='Conversation ID')
-    
+
     # Delete command
     delete_parser = subparsers.add_parser('delete', help='Delete a conversation')
     delete_parser.add_argument('id', help='Conversation ID')
-    
+
     # Reset command
     subparsers.add_parser('reset', help='Reset all data')
-    
+
+    # Create-admin command
+    subparsers.add_parser('create-admin', help='Bootstrap: Create the initial admin user')
+
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         return
-    
+
     cli = PortfolioCLI()
-    
+
     if args.command == 'ingest':
         cli.ingest_cv(args.cv_file)
     elif args.command == 'test':
@@ -204,6 +228,8 @@ Examples:
         cli.delete_conversation(args.id)
     elif args.command == 'reset':
         cli.reset_database()
+    elif args.command == 'create-admin':
+        cli.create_admin()
 
 
 if __name__ == '__main__':
