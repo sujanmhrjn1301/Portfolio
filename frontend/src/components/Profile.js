@@ -43,6 +43,10 @@ function Profile({ portfolioInfo, projects, onClose }) {
   ];
 
   const cvData = {
+    name: "Sujan Maharjan",
+    location: "Thecho, Lalitpur, Nepal",
+    email: "mhrjnsujan.official@gmail.com",
+    phone: "+977-9860942721",
     bio: "A self-motivated and adaptable individual with a strong aptitude for rapid learning, a keen openness to innovative concepts, and a growth mindset. Open-minded to feedback as a valuable opportunity for growth and continuous improvement.",
     
     experience: [
@@ -248,19 +252,19 @@ function Profile({ portfolioInfo, projects, onClose }) {
                   <div className="space-y-5 max-w-2xl">
                     <div>
                       <p className="text-xs font-semibold text-[#d1d5db] uppercase mb-1">Name</p>
-                      <p className="text-sm text-[#ececf1]">{portfolioInfo?.name}</p>
+                      <p className="text-sm text-[#ececf1]">{cvData.name}</p>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-[#d1d5db] uppercase mb-1">Location</p>
-                      <p className="text-sm text-[#ececf1]">{portfolioInfo?.location}</p>
+                      <p className="text-sm text-[#ececf1]">{cvData.location}</p>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-[#d1d5db] uppercase mb-1">Email</p>
-                      <a href={`mailto:${portfolioInfo?.email}`} className="text-sm text-blue-500 hover:text-blue-400">{portfolioInfo?.email}</a>
+                      <a href={`mailto:${cvData.email}`} className="text-sm text-blue-500 hover:text-blue-400">{cvData.email}</a>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-[#d1d5db] uppercase mb-1">Phone</p>
-                      <a href={`tel:${portfolioInfo?.phone}`} className="text-sm text-blue-500 hover:text-blue-400">{portfolioInfo?.phone}</a>
+                      <a href={`tel:${cvData.phone}`} className="text-sm text-blue-500 hover:text-blue-400">{cvData.phone}</a>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-[#d1d5db] uppercase mb-1">Bio</p>
