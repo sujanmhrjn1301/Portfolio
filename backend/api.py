@@ -24,6 +24,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 if ENVIRONMENT == "production":
     CORS_ORIGINS = [
         "https://sujanmaharjan5.com.np",  # Production Memora frontend
+        "https://portfolio-frontend-beta.onrender.com",  # Render frontend
         os.getenv("LEXI_CORS_ORIGIN", "https://sujanmaharjan5.com.np")  # Explicit override
     ]
 else:

@@ -173,6 +173,11 @@ function AppContent() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `❌ Error: ${error.message || 'Failed to get response. Please try again.'}`,
+        created_at: new Date().toISOString()
+      }]);
     } finally {
       setIsLoading(false);
     }
