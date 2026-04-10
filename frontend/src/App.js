@@ -5,7 +5,7 @@ import ChatWindow from './components/ChatWindow';
 import SharedView from './components/SharedView';
 import Profile from './components/Profile';
 import AdminPanel from './components/AdminPanel';
-import { chatAPI } from './api';
+import { chatAPI, askLexi } from './api';
 import './index.css';
 
 function AppContent() {
@@ -22,6 +22,7 @@ function AppContent() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [lexiModeEnabled, setLexiModeEnabled] = useState(false);
 
   // Load portfolio info and GitHub projects on mount
   useEffect(() => {
@@ -133,26 +134,41 @@ function AppContent() {
 
     setIsLoading(true);
     try {
-      const response = await chatAPI.sendMessage(convId, message, githubModeEnabled, genZModeEnabled);
-      
-      // Add assistant response after API call
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response.response,
-        created_at: new Date().toISOString()
-      }]);
+      if (lexiModeEnabled) {
+        // Lexi mode: send to Lexi API
+        const mode = githubModeEnabled ? "github" : genZModeEnabled ? "gen-z" : "github";
+        const response = await askLexi(message, mode);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'lexi',
+            content: response.answer,
+            metadata: response.metadata,
+            process_logs: response.process_logs,
+            created_at: new Date().toISOString()
+          }
+        ]);
+      } else {
+        // Default: send to your own backend
+        const response = await chatAPI.sendMessage(convId, message, githubModeEnabled, genZModeEnabled);
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: response.response,
+          created_at: new Date().toISOString()
+        }]);
 
-      // Update conversation title only for the FIRST message
-      if (isFirstMessage && (isNewConversation || currentConversation?.title === 'New Chat')) {
-        try {
-          const titlepreview = message.substring(0, 50).trim();
-          await chatAPI.updateConversation(convId, titlepreview);
-        } catch (error) {
-          console.error('Error updating conversation title:', error);
+        // Update conversation title only for the FIRST message
+        if (isFirstMessage && (isNewConversation || currentConversation?.title === 'New Chat')) {
+          try {
+            const titlepreview = message.substring(0, 50).trim();
+            await chatAPI.updateConversation(convId, titlepreview);
+          } catch (error) {
+            console.error('Error updating conversation title:', error);
+          }
         }
-      }
 
-      await loadConversations();
+        await loadConversations();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -237,6 +253,8 @@ function AppContent() {
               onToggleGithubMode={setGithubModeEnabled}
               genZModeEnabled={genZModeEnabled}
               onToggleGenZMode={setGenZModeEnabled}
+              lexiModeEnabled={lexiModeEnabled}
+              onToggleLexiMode={setLexiModeEnabled}
             />
 
             {/* Profile Modal Overlay */}

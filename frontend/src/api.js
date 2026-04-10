@@ -1,3 +1,15 @@
+// Lexi API integration
+export const askLexi = async (query, mode = "github") => {
+  // Replace with your deployed Lexi FastAPI endpoint
+  const LEXI_API_URL = "https://your-lexi-api.onrender.com/api/v1/ask";
+  const response = await fetch(LEXI_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, mode }),
+  });
+  if (!response.ok) throw new Error("Lexi API error");
+  return await response.json(); // { answer, metadata, process_logs }
+};
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';

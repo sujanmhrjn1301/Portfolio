@@ -12,6 +12,8 @@ function ChatWindow({
   onToggleGithubMode,
   genZModeEnabled,
   onToggleGenZMode,
+  lexiModeEnabled = false,
+  onToggleLexiMode = () => {},
 }) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -145,6 +147,7 @@ function ChatWindow({
             </button> */}
           </div>
         </div>
+
       ) : (
         <div className="flex-1 overflow-y-auto bg-[#1a1a1a]">
           <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-3 sm:space-y-4">
@@ -154,12 +157,52 @@ function ChatWindow({
                 <p className="text-sm text-[#9ca3af]">Starting conversation...</p>
               </div>
             )}
-
+            {/* Lexi Mode Toggle */}
+            <div className="flex items-center gap-2 px-3 sm:px-4 mb-2">
+              <button
+                type="button"
+                onClick={() => onToggleLexiMode(!lexiModeEnabled)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 min-h-10 ${
+                  lexiModeEnabled
+                    ? 'bg-green-500/20 text-green-400 border border-green-400/50 shadow-lg shadow-green-500/20'
+                    : 'bg-[#2a2a2a] text-[#9ca3af] border border-[#404040] hover:border-[#505050] hover:text-white'
+                }`}
+                title="Toggle Lexi Mode"
+              >
+                <Brain size={16} />
+                <span className="hidden sm:inline">Lexi Mode</span>
+                <span className="sm:hidden">Lexi</span>
+              </button>
+              {lexiModeEnabled && (
+                <span className="text-xs text-green-400 animate-pulse">● Active</span>
+              )}
+            </div>
             {messages.map((message, idx) => {
               // Only animate last AI message if: same conversation, new message added, and previous was user message
               const isSameConversation = prevConversationIdRef.current === currentConversation?.id;
               const isNewMessageAdded = messages.length > prevMessageCountRef.current;
               const isNew = isSameConversation && isNewMessageAdded && message.role !== 'user' && idx === messages.length - 1 && idx > 0 && messages[idx - 1].role === 'user';
+                // Lexi message: show answer, metadata, process_logs
+                if (message.role === 'lexi') {
+                  return (
+                    <div key={idx} className="mb-4">
+                      <MessageBubble message={{ role: 'assistant', content: message.content }} isNew={isNew} />
+                      {message.metadata && (
+                        <div className="text-xs text-green-400 mt-1">Source: {message.metadata}</div>
+                      )}
+                      {message.process_logs && message.process_logs.length > 0 && (
+                        <details className="mt-1 text-xs text-[#9ca3af]">
+                          <summary className="cursor-pointer">Show Lexi process logs</summary>
+                          <ul className="list-disc ml-5">
+                            {message.process_logs.map((log, i) => (
+                              <li key={i}>{log}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
+                    </div>
+                  );
+                }
               return <MessageBubble key={idx} message={message} isNew={isNew} />;
             })}
 
