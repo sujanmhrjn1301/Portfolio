@@ -31,9 +31,11 @@ function AppContent() {
     const checkBackend = async () => {
       try {
         await chatAPI.healthCheck();
+        if (stopped) return false;
         setBackendLive(true);
         return true;
       } catch {
+        if (stopped) return false;
         setBackendLive(false);
         return false;
       }
@@ -42,10 +44,12 @@ function AppContent() {
     // Poll every 2 seconds until backend is live
     const pollBackend = async () => {
       const live = await checkBackend();
+      if (stopped) return;
       if (!live && !stopped) {
         intervalId = setTimeout(pollBackend, 2000);
       } else if (live) {
         // Once backend is live, load data
+        if (stopped) return;
         loadPortfolioInfo();
         fetchGitHubProjects();
         loadConversations();
