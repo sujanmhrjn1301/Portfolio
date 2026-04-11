@@ -260,64 +260,6 @@ function AppContent() {
   };
 
   return (
-<<<<<<< HEAD
-    <Routes>
-      <Route path="/shared/:shareId" element={<SharedView />} />
-      <Route
-        path="/*"
-        element={
-          <div className="flex h-screen bg-dark-gray text-lighter-gray overflow-hidden">
-            {/* Sidebar */}
-            <Sidebar
-              conversations={conversations}
-              currentConversation={currentConversation}
-              onNewChat={handleNewChat}
-              onSelectConversation={handleSelectConversation}
-              onDeleteConversation={handleDeleteConversation}
-              onShareConversation={handleShareConversation}
-              portfolioInfo={portfolioInfo}
-              isOpen={sidebarOpen}
-              onToggle={() => setSidebarOpen(!sidebarOpen)}
-              onProfileClick={handleProfileClick}
-              onAdminClick={handleAdminClick}
-            />
-
-            {/* Main Chat Window */}
-            <ChatWindow
-              messages={messages}
-              isLoading={isLoading}
-              onSendMessage={handleSendMessage}
-              portfolioInfo={portfolioInfo}
-              currentConversation={currentConversation}
-              githubModeEnabled={githubModeEnabled}
-              onToggleGithubMode={setGithubModeEnabled}
-              genZModeEnabled={genZModeEnabled}
-              onToggleGenZMode={setGenZModeEnabled}
-              lexiModeEnabled={lexiModeEnabled}
-              onToggleLexiMode={handleToggleLexiMode}
-            />
-
-            {/* Profile Modal Overlay */}
-            {showProfileModal && (
-              <Profile portfolioInfo={portfolioInfo} projects={projects} onClose={handleCloseProfileModal} />
-            )}
-
-            {/* Admin Panel Modal */}
-            {showAdminPanel && (
-              <AdminPanel onClose={handleCloseAdminPanel} />
-            )}
-
-            {/* Lexi Terminal Modal */}
-            <LexiTerminal
-              isOpen={showLexiTerminal}
-              onClose={() => setShowLexiTerminal(false)}
-              mode={githubModeEnabled ? 'github' : genZModeEnabled ? 'gen-z' : 'github'}
-            />
-          </div>
-        }
-      />
-    </Routes>
-=======
     <>
       {!backendLive && <BackendWaitModal />}
       <Routes>
@@ -362,7 +304,6 @@ function AppContent() {
         />
       </Routes>
     </>
->>>>>>> 8ac99aaaf6a23e7548c119e0d4107dac65d852a1
   );
   }
 
