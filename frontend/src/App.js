@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import SharedView from './components/SharedView';
 import Profile from './components/Profile';
+import BackendWaitModal from './components/BackendWaitModal';
 import { chatAPI } from './api';
 import './index.css';
 
@@ -20,46 +21,71 @@ function AppContent() {
   const [genZModeEnabled, setGenZModeEnabled] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [backendLive, setBackendLive] = useState(false);
 
-  // Load portfolio info and GitHub projects on mount
+  // Backend health check and data loading
   useEffect(() => {
-    const loadPortfolioInfo = async () => {
+    let intervalId;
+    let stopped = false;
+
+    const checkBackend = async () => {
       try {
-        const info = await chatAPI.getPortfolioInfo();
-        setPortfolioInfo(info);
-      } catch (error) {
-        console.error('Error loading portfolio info:', error);
+        await chatAPI.healthCheck();
+        setBackendLive(true);
+        return true;
+      } catch {
+        setBackendLive(false);
+        return false;
       }
     };
 
-    const fetchGitHubProjects = async () => {
-      try {
-        // Use backend API instead of direct GitHub API call
-        // This allows the backend to handle auth and rate limiting
-        const repos = await chatAPI.getGitHubRepositories();
-        
-        // Filter out forks and map to project format
-        const projectsData = repos
-          .filter(repo => !repo.fork_count || repo.fork_count === 0) // Only include original projects
-          .map(repo => ({
-            title: repo.name,
-            description: repo.description || 'No description available',
-            link: repo.url,
-            language: repo.language,
-            stars: repo.stars,
-          }));
-        
-        setProjects(projectsData);
-      } catch (error) {
-        console.error('Error fetching GitHub projects:', error);
-        // Silently fail - projects just won't show
+    // Poll every 2 seconds until backend is live
+    const pollBackend = async () => {
+      const live = await checkBackend();
+      if (!live && !stopped) {
+        intervalId = setTimeout(pollBackend, 2000);
+      } else if (live) {
+        // Once backend is live, load data
+        loadPortfolioInfo();
+        fetchGitHubProjects();
+        loadConversations();
       }
     };
-
-    loadPortfolioInfo();
-    fetchGitHubProjects();
-    loadConversations();
+    pollBackend();
+    return () => {
+      stopped = true;
+      if (intervalId) clearTimeout(intervalId);
+    };
+    // eslint-disable-next-line
   }, []);
+
+  // Data loading functions
+  const loadPortfolioInfo = async () => {
+    try {
+      const info = await chatAPI.getPortfolioInfo();
+      setPortfolioInfo(info);
+    } catch (error) {
+      console.error('Error loading portfolio info:', error);
+    }
+  };
+
+  const fetchGitHubProjects = async () => {
+    try {
+      const repos = await chatAPI.getGitHubRepositories();
+      const projectsData = repos
+        .filter(repo => !repo.fork_count || repo.fork_count === 0)
+        .map(repo => ({
+          title: repo.name,
+          description: repo.description || 'No description available',
+          link: repo.url,
+          language: repo.language,
+          stars: repo.stars,
+        }));
+      setProjects(projectsData);
+    } catch (error) {
+      console.error('Error fetching GitHub projects:', error);
+    }
+  };
 
   // Load conversation history when current conversation changes
   useEffect(() => {
@@ -195,47 +221,50 @@ function AppContent() {
   };
 
   return (
-    <Routes>
-      <Route path="/shared/:shareId" element={<SharedView />} />
-      <Route
-        path="/*"
-        element={
-          <div className="flex h-screen bg-dark-gray text-lighter-gray overflow-hidden">
-            {/* Sidebar */}
-            <Sidebar
-              conversations={conversations}
-              currentConversation={currentConversation}
-              onNewChat={handleNewChat}
-              onSelectConversation={handleSelectConversation}
-              onDeleteConversation={handleDeleteConversation}
-              onShareConversation={handleShareConversation}
-              portfolioInfo={portfolioInfo}
-              isOpen={sidebarOpen}
-              onToggle={() => setSidebarOpen(!sidebarOpen)}
-              onProfileClick={handleProfileClick}
-            />
+    <>
+      {!backendLive && <BackendWaitModal />}
+      <Routes>
+        <Route path="/shared/:shareId" element={<SharedView />} />
+        <Route
+          path="/*"
+          element={
+            <div className="flex h-screen bg-dark-gray text-lighter-gray overflow-hidden">
+              {/* Sidebar */}
+              <Sidebar
+                conversations={conversations}
+                currentConversation={currentConversation}
+                onNewChat={handleNewChat}
+                onSelectConversation={handleSelectConversation}
+                onDeleteConversation={handleDeleteConversation}
+                onShareConversation={handleShareConversation}
+                portfolioInfo={portfolioInfo}
+                isOpen={sidebarOpen}
+                onToggle={() => setSidebarOpen(!sidebarOpen)}
+                onProfileClick={handleProfileClick}
+              />
 
-            {/* Main Chat Window */}
-            <ChatWindow
-              messages={messages}
-              isLoading={isLoading}
-              onSendMessage={handleSendMessage}
-              portfolioInfo={portfolioInfo}
-              currentConversation={currentConversation}
-              githubModeEnabled={githubModeEnabled}
-              onToggleGithubMode={setGithubModeEnabled}
-              genZModeEnabled={genZModeEnabled}
-              onToggleGenZMode={setGenZModeEnabled}
-            />
+              {/* Main Chat Window */}
+              <ChatWindow
+                messages={messages}
+                isLoading={isLoading}
+                onSendMessage={handleSendMessage}
+                portfolioInfo={portfolioInfo}
+                currentConversation={currentConversation}
+                githubModeEnabled={githubModeEnabled}
+                onToggleGithubMode={setGithubModeEnabled}
+                genZModeEnabled={genZModeEnabled}
+                onToggleGenZMode={setGenZModeEnabled}
+              />
 
-            {/* Profile Modal Overlay */}
-            {showProfileModal && (
-              <Profile portfolioInfo={portfolioInfo} projects={projects} onClose={handleCloseProfileModal} />
-            )}
-          </div>
-        }
-      />
-    </Routes>
+              {/* Profile Modal Overlay */}
+              {showProfileModal && (
+                <Profile portfolioInfo={portfolioInfo} projects={projects} onClose={handleCloseProfileModal} />
+              )}
+            </div>
+          }
+        />
+      </Routes>
+    </>
   );
   }
 
