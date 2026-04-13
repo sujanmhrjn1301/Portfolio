@@ -65,7 +65,7 @@ CORS_ORIGINS = get_cors_origins()
 CHAT_CONFIG = {
     "model": os.getenv("CHAT_MODEL", "openai/gpt-4o-mini"),
     "temperature": float(os.getenv("CHAT_TEMPERATURE", "0.4")),
-    "max_tokens": int(os.getenv("CHAT_MAX_TOKENS", "350")),
+    "max_tokens": int(os.getenv("CHAT_MAX_TOKENS", "1000")),
     "system_prompt": """You are a professional portfolio assistant for {name}.
 
 RESPONSE GUIDELINES:
