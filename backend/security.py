@@ -228,6 +228,10 @@ async def check_rate_limit(request: Request) -> bool:
     Raises:
         HTTPException: If rate limited
     """
+    # Skip rate limiting for CORS preflight (OPTIONS) requests
+    if request.method == "OPTIONS":
+        return True
+        
     client_ip = get_client_ip(request)
     
     if not rate_limiter.is_allowed(client_ip):

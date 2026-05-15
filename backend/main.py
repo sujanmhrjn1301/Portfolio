@@ -91,15 +91,6 @@ app = FastAPI(
 # NOTE: Removed TrustedHostMiddleware since Render handles reverse proxy host validation
 # CORS middleware below properly handles cross-origin requests from frontend
 
-# Add CORS middleware with secure configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],  # Specific methods only
-    allow_headers=["Content-Type", "Authorization"],  # Specific headers only
-    max_age=3600,  # 1 hour cache
-)
 
 
 @app.middleware("http")
@@ -129,6 +120,18 @@ async def rate_limit_middleware(request: Request, call_next):
         )
     
     return await call_next(request)
+
+
+# Add CORS middleware with secure configuration LAST so it wraps all other middlewares
+# This ensures CORS headers are added even to error responses from other middlewares
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],  # Specific methods only
+    allow_headers=["Content-Type", "Authorization"],  # Specific headers only
+    max_age=3600,  # 1 hour cache
+)
 
 
 @app.exception_handler(Exception)
