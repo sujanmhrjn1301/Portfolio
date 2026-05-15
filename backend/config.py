@@ -48,7 +48,8 @@ def get_cors_origins() -> List[str]:
     if ENVIRONMENT == "production":
         # Production: only specific domains
         return [
-            "https://sujanmaharjan.com",  # Update with your domain
+            "https://sujanmaharjan5.com.np",  # Updated to match your actual domain
+            "https://www.sujanmaharjan5.com.np",
         ]
     
     # Development: localhost only
